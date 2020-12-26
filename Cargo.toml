@@ -5,3 +5,5 @@ authors = ["Mat Trudel <mat@geeky.net>"]
 edition = "2018"
 
 [dependencies]
+env_logger = "0.8"
+libmdns = "0.5"
