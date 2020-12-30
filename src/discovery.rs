@@ -1,4 +1,4 @@
-pub fn start(accessory_server: crate::AccessoryServer) -> libmdns::Service {
+pub fn start(accessory_server: &crate::AccessoryServer) -> libmdns::Service {
     let responder = libmdns::Responder::new().unwrap();
     responder.register(
         "_hap._tcp".to_owned(),
