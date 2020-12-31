@@ -10,6 +10,7 @@ pub struct AccessoryServer {
 }
 
 pub fn start(server: AccessoryServer) {
+    // TODO - these should be async
     discovery::start(&server);
     web::start(&server);
 }
