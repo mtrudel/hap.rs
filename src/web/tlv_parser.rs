@@ -4,17 +4,29 @@
 
 use std::collections::HashMap;
 
-pub fn parse<'a>(bytes : &'a Vec<u8>) -> HashMap<i32, &'a [u8]> {
-    let mut map = HashMap::new();
-    _parse(&bytes, &mut map);
-    map
+pub fn parse(bytes : &Vec<u8>) -> HashMap<i32, Vec<u8>> {
+    // Use a list of tuples so we can handle multi-occurrences of specific keys,
+    // as comes up in the list-pairings endpoint
+    let mut entries : Vec<(i32, Vec<u8>)> = Vec::new();
+    _parse(&bytes, &mut entries);
+    entries.into_iter().collect()
 }
 
-fn _parse<'a>(bytes : &'a [u8], map : &mut HashMap<i32, &'a [u8]>) {
+fn _parse(bytes : &[u8], entries : &mut Vec<(i32, Vec<u8>)>) {
     let last_byte : usize = (2 + (bytes[1] as usize)).into();
-    map.insert(bytes[0].into(), &bytes[2..last_byte]);
+    let tag : i32 = bytes[0].into();
+    let value = &bytes[2..last_byte];
+
+    match entries.last_mut() {
+        Some((prev_tag, prev_value)) if prev_tag == &tag =>
+            prev_value.extend_from_slice(value),
+
+        _ =>
+            entries.push((tag, value.to_vec()))
+    }
+
     if bytes.len() > last_byte {
-        _parse(&bytes[last_byte..], map);
+        _parse(&bytes[last_byte..], entries);
     }
 }
 
@@ -53,7 +65,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn multipart_value() {
         let bytes = [vec![1, 255], vec![1, 2, 3, 4, 5].repeat(51), vec![1, 5], vec![1,2,3,4,5]].concat();
         let result = parse(&bytes);

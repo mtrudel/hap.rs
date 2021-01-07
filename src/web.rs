@@ -20,7 +20,7 @@ async fn pair_setup(mut req: tide::Request<()>) -> tide::Result {
     let params = tlv_parser::parse(&body);
 
     let _result = match params.get(&pair_setup::kTLVType_State) {
-        Some(&[1]) => pair_setup::m1(params),
+        Some(x) if x[0] == 1 => pair_setup::m1(&params),
         _ => panic!("Unknown state")
     };
 
